@@ -1,0 +1,88 @@
+#!/usr/bin/python3
+
+import time
+from functools import reduce
+
+
+def factorize(n):
+    """
+    This function takes a natural number `n` and returns its factorization as
+    a list of prime numbers.
+
+    Args:
+    n: A natural number.
+
+    Returns:
+    A list of prime numbers that factorize `n`.
+    """
+    factors = []
+    i = 2
+
+    while i * i <= n:
+        if n % i:
+            i += 1
+        else:
+            n //= i
+            factors.insert(0, i)
+
+    if n > 1:
+        factors.insert(0, n)
+
+    return factors
+
+
+def format_time(time_value):
+    """
+    Formats a time value with dynamic minutes and seconds, and prepends "0m".
+    """
+    minutes = int(time_value // 60)
+    seconds = time_value - minutes * 60
+    formatted_time = f"0m{seconds:.3f}s"
+    if minutes > 0:
+        formatted_time = f"{minutes}m{formatted_time}"
+    return formatted_time
+
+
+def main():
+    """
+    This function reads numbers from a file, factorizes each number, and prints
+    the factorization to the console.
+
+    Args:
+    None.
+
+    Returns:
+    None.
+    """
+    # Read numbers from a file
+    try:
+        with open("tests/test00", "r") as f:
+            numbers = [int(line.strip()) for line in f if line.strip()]
+    except FileNotFoundError:
+        print("Error: File 'test00' not found!")
+        return
+
+    # Start time measurement
+    start_time = time.time()
+
+    # Factorize each number and print the result
+    for number in numbers:
+        factors = factorize(number)
+        highest_factor = reduce(lambda x, y: x * y, factors[:-1])
+        if len(factors) >= 2:  # Check if there are at least two factors
+            print(f"{number}={highest_factor}*{factors[-1]}")
+        else:
+            factor_string = "*".join(str(factor) for factor in factors)
+            print(f"{number}={factor_string}")
+
+    end_time = time.time()
+    user_time, sys_time = time.process_time(), time.process_time()
+    elapsed_time = end_time - start_time
+
+    print(f"real\t{format_time(elapsed_time)}")
+    print(f"user\t{format_time(user_time)}")
+    print(f"sys\t{format_time(sys_time)}")
+
+
+if __name__ == "__main__":
+    main()
